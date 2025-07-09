@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Travel Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Dark background with subtle gradient */
+            background: linear-gradient(135deg, #1a202c, #2d3748); /* Dark gray to slightly lighter gray */
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        /* Animated gradient background for the main container */
+        .main-container {
+            background: linear-gradient(135deg, #1a202c, #2d3748);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Custom styles for message area animation */
+        .message-enter {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        .message-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        }
+        .message-exit {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .message-exit-active {
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease-in, transform 0.3s ease-in;
+        }
+
+        /* Responsive adjustments for the main container */
+        @media (min-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr 1fr; /* Two columns for larger screens */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container rounded-xl shadow-2xl overflow-hidden w-full max-w-5xl md:grid md:grid-cols-2">
+
+        <div class="relative p-8 flex flex-col items-center justify-center text-white bg-gradient-to-br from-blue-700 to-indigo-900 md:min-h-[500px] min-h-[300px] text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
+                Your Journey, <br>Perfectly Planned.
+            </h1>
+            <p class="text-lg md:text-xl text-blue-100 mb-8 max-w-sm">
+                Unlock seamless adventures with AI-powered itineraries, personalized recommendations, and real-time updates.
+            </p>
+            <svg class="w-32 h-32 text-white opacity-80 animate-pulse" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 .55.45 1 1 1h2v1.93l-1 .07zm7.92-2.54c-.58.89-1.34 1.63-2.23 2.15l-.89-1.78c.7-.35 1.3-.87 1.77-1.55l1.35 1.18zM12 4.07c3.95.49 7 3.85 7 7.93 0 .62-.08 1.21-.21 1.79L15 9V8c0-.55-.45-1-1-1h-2V4.07l1-.07zm-7.92 2.54c.58-.89 1.34-1.63 2.23-2.15l.89 1.78c-.7.35-1.3.87-1.77 1.55l-1.35-1.18zM12 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+            </svg>
+        </div>
+
+        <div class="p-8 bg-gray-800 text-white flex flex-col justify-center">
+            <div id="message-area" class="hidden p-3 mb-4 rounded-lg text-sm text-center"></div>
+
+            <div id="logged-in-status" class="text-center mb-6 hidden">
+                <p class="text-xl font-semibold mb-4">Welcome, <span id="userGreeting">Guest</span>!</p>
+                <button id="goToPlannerBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:-translate-y-0.5">Go to Planner</button>
+                <button id="logoutBtn" class="mt-4 w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:-translate-y-0.5">Logout</button>
+            </div>
+
+            <div id="auth-section">
+                <h2 id="form-title" class="text-3xl font-bold text-center mb-6">
+                    Welcome Back!
+                </h2>
+
+                <form id="login-form" class="space-y-5">
+                    <div>
+                        <label for="loginEmail" class="block text-sm font-medium text-gray-300 mb-1">
+                            Email Address
+                        </label>
+                        <input
+                            type="email"
+                            id="loginEmail"
+                            name="loginEmail"
+                            required
+                            class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200"
+                            placeholder="you@example.com"
+                        />
+                    </div>
+                    <div>
+                        <label for="loginPassword" class="block text-sm font-medium text-gray-300 mb-1">
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            id="loginPassword"
+                            name="loginPassword"
+                            required
+                            class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition duration-200"
+                            placeholder="••••••••"
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        id="login-button"
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:-translate-y-0.5 flex items-center justify-center"
+                    >
+                        Log In
+                    </button>
+                </form>
+
+                <form id="register-form" class="space-y-5 hidden">
+                    <div>
+                        <label for="registerFullName" class="block text-sm font-medium text-gray-300 mb-1">
+                            Full Name
+                        </label>
+                        <input
+                            type="text"
+                            id="registerFullName"
+                            name="registerFullName"
+                            required
+                            class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition duration-200"
+                            placeholder="John Doe"
+                        />
+                    </div>
+                    <div>
+                        <label for="registerEmail" class="block text-sm font-medium text-gray-300 mb-1">
+                            Email Address
+                        </label>
+                        <input
+                            type="email"
+                            id="registerEmail"
+                            name="registerEmail"
+                            required
+                            class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition duration-200"
+                            placeholder="you@example.com"
+                        />
+                    </div>
+                    <div>
+                        <label for="registerPhoneNumber" class="block text-sm font-medium text-gray-300 mb-1">
+                            Phone Number (Optional)
+                        </label>
+                        <input
+                            type="tel"
+                            id="registerPhoneNumber"
+                            name="registerPhoneNumber"
+                            class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition duration-200"
+                            placeholder="e.g., +1234567890"
+                        />
+                    </div>
+                    <div>
+                        <label for="registerPassword" class="block text-sm font-medium text-gray-300 mb-1">
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            id="registerPassword"
+                            name="registerPassword"
+                            required
+                            class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition duration-200"
+                            placeholder="••••••••"
+                        />
+                    </div>
+                    <div>
+                        <label for="confirmPassword" class="block text-sm font-medium text-gray-300 mb-1">
+                            Confirm Password
+                        </label>
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            required
+                            class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition duration-200"
+                            placeholder="••••••••"
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        id="register-button"
+                        class="w-full bg-teal-600 text-white py-3 rounded-lg font-semibold hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:-translate-y-0.5 flex items-center justify-center"
+                    >
+                        Register
+                    </button>
+                </form>
+
+                <p class="mt-6 text-center text-gray-400 text-sm">
+                    <span id="toggle-text">Don't have an account?</span>
+                    <button
+                        type="button"
+                        id="toggle-button"
+                        class="font-medium text-blue-400 hover:text-blue-300 focus:outline-none focus:underline"
+                    >
+                        Sign Up
+                    </button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const formTitle = document.getElementById('form-title');
+        const messageArea = document.getElementById('message-area');
+        const toggleButton = document.getElementById('toggle-button');
+        const toggleText = document.getElementById('toggle-text');
+        const authSection = document.getElementById('auth-section');
+
+        // Elements for logged-in status
+        const loggedInStatusSection = document.getElementById('logged-in-status');
+        const userGreeting = document.getElementById('userGreeting');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const goToPlannerBtn = document.getElementById('goToPlannerBtn');
+
+
+        // Form fields
+        const loginEmailInput = document.getElementById('loginEmail');
+        const loginPasswordInput = document.getElementById('loginPassword');
+        const registerFullNameInput = document.getElementById('registerFullName');
+        const registerEmailInput = document.getElementById('registerEmail');
+        const registerPhoneNumberInput = document.getElementById('registerPhoneNumber');
+        const registerPasswordInput = document.getElementById('registerPassword');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+
+        // Buttons for loading states
+        const loginButton = document.getElementById('login-button');
+        const registerButton = document.getElementById('register-button');
+
+        // --- State Variables ---
+        let isLogin = true; // Tracks current form view (true for login, false for register)
+
+        // --- API Base URL ---
+        const AUTH_API_BASE    = 'http://127.0.0.1:8000/api';
+        const PLANNER_API_BASE = 'http://127.0.0.1:8000/planner';
+
+
+        // --- Utility Functions ---
+
+        /**
+         * Displays a message to the user with animation.
+         * @param {string} msg - The message to display.
+         * @param {'success'|'error'} type - The type of message ('success' or 'error').
+         */
+        function showMessage(msg, type) {
+            messageArea.textContent = msg;
+            messageArea.classList.remove('hidden', 'bg-red-900', 'text-red-300', 'bg-green-900', 'text-green-300');
+            messageArea.classList.add('message-enter');
+            
+            if (type === 'error') {
+                messageArea.classList.add('bg-red-900', 'text-red-300');
+            } else {
+                messageArea.classList.add('bg-green-900', 'text-green-300');
+            }
+
+            void messageArea.offsetWidth; // Trigger reflow to ensure animation plays
+            messageArea.classList.add('message-enter-active');
+        }
+
+        /**
+         * Clears the displayed message with animation.
+         */
+        function clearMessage() {
+            if (!messageArea.classList.contains('hidden')) {
+                messageArea.classList.add('message-exit');
+                messageArea.classList.remove('message-enter-active');
+                void messageArea.offsetWidth; // Trigger reflow
+                messageArea.classList.add('message-exit-active');
+
+                messageArea.addEventListener('transitionend', function handler() {
+                    messageArea.classList.add('hidden');
+                    messageArea.classList.remove('bg-red-900', 'text-red-300', 'bg-green-900', 'text-green-300', 'message-enter', 'message-exit', 'message-exit-active');
+                    messageArea.removeEventListener('transitionend', handler);
+                }, { once: true });
+            }
+        }
+
+        /**
+         * Sets the loading state for a button.
+         * @param {HTMLElement} button - The button element.
+         * @param {boolean} isLoading - True to show loading, false to hide.
+         * @param {string} originalText - The original text of the button.
+         */
+        function setLoadingState(button, isLoading, originalText) {
+            if (isLoading) {
+                button.disabled = true;
+                button.innerHTML = `
+                    <svg class="animate-spin h-5 w-5 text-white mr-3" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                `;
+            } else {
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }
+        }
+
+        /**
+         * Updates the UI based on the user's login status.
+         * @param {object|null} user - The user object if logged in, null otherwise.
+         */
+        function updateUI(user) {
+            if (user) {
+                authSection.classList.add('hidden');
+                loggedInStatusSection.classList.remove('hidden');
+                // Display full_name if available, otherwise email
+                userGreeting.textContent = user.full_name || user.email; 
+            } else {
+                authSection.classList.remove('hidden');
+                loggedInStatusSection.classList.add('hidden');
+                // Ensure forms are reset and login form is shown by default
+                toggleForms(true); // Forces switch to login form
+            }
+            clearMessage();
+        }
+
+        /**
+         * Checks if a user token exists in localStorage and attempts to fetch user data.
+         * This simulates a persistent login session.
+         */
+        async function checkAuthStatus() {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                try {
+                    const res = await fetch(`${AUTH_API_BASE}/profile/`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Token ${token}` // Use Token authentication
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        updateUI(data); // Update UI with fetched user data
+                    } else {
+                        // Token might be invalid or expired
+                        console.error('Failed to fetch user profile:', response.statusText);
+                        localStorage.removeItem('authToken'); // Clear invalid token
+                        updateUI(null); // Show login forms
+                    }
+                } catch (error) {
+                    console.error('Network error during profile fetch:', error);
+                    localStorage.removeItem('authToken');
+                    updateUI(null);
+                }
+            } else {
+                updateUI(null); // No token, show login forms
+            }
+        }
+
+        // --- Event Handlers ---
+
+        /**
+         * Toggles between the login and registration forms.
+         * @param {boolean} [forceLogin=false] - If true, forces the form to login state.
+         */
+        function toggleForms(forceLogin = false) {
+            isLogin = forceLogin ? true : !isLogin;
+            clearMessage(); // Clear messages when switching forms
+
+            if (isLogin) {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                formTitle.textContent = 'Welcome Back!';
+                toggleText.textContent = "Don't have an account?";
+                toggleButton.textContent = 'Sign Up';
+                toggleButton.classList.remove('text-teal-400', 'hover:text-teal-300');
+                toggleButton.classList.add('text-blue-400', 'hover:text-blue-300');
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                formTitle.textContent = 'Join Us!';
+                toggleText.textContent = "Already have an account?";
+                toggleButton.textContent = 'Log In';
+                toggleButton.classList.remove('text-blue-400', 'hover:text-blue-300');
+                toggleButton.classList.add('text-teal-400', 'hover:text-teal-300');
+            }
+
+            // Clear form fields when switching
+            loginEmailInput.value = '';
+            loginPasswordInput.value = '';
+            registerFullNameInput.value = '';
+            registerEmailInput.value = '';
+            registerPhoneNumberInput.value = '';
+            registerPasswordInput.value = '';
+            confirmPasswordInput.value = '';
+        }
+
+        /**
+         * Handles user registration.
+         * Makes an API call to the Django backend.
+         * @param {Event} e - The form submission event.
+         */
+        registerForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            clearMessage();
+            setLoadingState(registerButton, true, 'Register');
+
+            const fullName = registerFullNameInput.value;
+            const email = registerEmailInput.value;
+            const phoneNumber = registerPhoneNumberInput.value;
+            const password = registerPasswordInput.value;
+            const confirm = confirmPasswordInput.value;
+
+            if (!fullName || !email || !password || !confirm) {
+                showMessage('Please fill in all required fields.', 'error');
+                setLoadingState(registerButton, false, 'Register');
+                return;
+            }
+            if (password !== confirm) {
+                showMessage('Passwords do not match.', 'error');
+                setLoadingState(registerButton, false, 'Register');
+                return;
+            }
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters long.', 'error');
+                setLoadingState(registerButton, false, 'Register');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${AUTH_API_BASE}/register/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        full_name: fullName,
+                        email: email,
+                        phone_number: phoneNumber,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('Registration successful! Please log in.', 'success');
+                    toggleForms(true); // Switch to login form after successful registration
+                } else {
+                    // Handle specific errors from Django backend
+                    let errorMessage = 'Registration failed. Please try again.';
+                    if (data.email) {
+                        errorMessage = `Email: ${data.email[0]}`;
+                    } else if (data.password) {
+                        errorMessage = `Password: ${data.password[0]}`;
+                    } else if (data.detail) {
+                        errorMessage = data.detail;
+                    }
+                    showMessage(errorMessage, 'error');
+                }
+            } catch (error) {
+                console.error("Network error during registration:", error);
+                showMessage('Network error. Could not connect to the server.', 'error');
+            } finally {
+                setLoadingState(registerButton, false, 'Register');
+            }
+        });
+
+        /**
+         * Handles user login.
+         * Makes an API call to the Django backend.
+         * @param {Event} e - The form submission event.
+         */
+        loginForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    clearMessage();
+    setLoadingState(loginButton, true, 'Log In');
+
+    const email = loginEmailInput.value;
+    const password = loginPasswordInput.value;
+
+    if (!email || !password) {
+        showMessage('Please fill in both email and password.', 'error');
+        setLoadingState(loginButton, false, 'Log In');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${AUTH_API_BASE}/login/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            localStorage.setItem('authToken', data.token);
+
+            const profileRes = await fetch(`${AUTH_API_BASE}/profile/`, {
+                headers: {
+                    'Authorization': `Token ${data.token}`
+                }
+            });
+
+            if (profileRes.ok) {
+                const userData = await profileRes.json();
+                userGreeting.textContent = userData.full_name || userData.email;
+                updateUI(userData); // Show dashboard
+                showMessage('Login successful! You can now use the planner.', 'success');
+            } else {
+                showMessage('Login succeeded but failed to fetch profile info.', 'error');
+            }
+
+        } else {
+            showMessage(data.detail || 'Login failed. Please check your credentials.', 'error');
+        }
+    } catch (error) {
+        console.error("Login error:", error);
+        showMessage('Network error. Could not connect to the server.', 'error');
+    } finally {
+        setLoadingState(loginButton, false, 'Log In');
+    }
+});
+
+        /**
+         * Handles user logout.
+         * Makes an API call to the Django backend and clears local storage.
+         */
+        logoutBtn.addEventListener('click', async function() {
+            clearMessage();
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                try {
+                    // Optional: Call logout API endpoint if your backend requires it
+                    // Note: Django Rest Framework's knox usually handles token invalidation on the server
+                    // simply by deleting the token, so an explicit /logout/ endpoint might not be strictly necessary
+                    // if you're just removing the token locally. However, if your backend uses Djoser or similar,
+                    // it might have a /logout/ endpoint to blacklist the token.
+                    await fetch(`${AUTH_API_BASE}/logout/`, {
+
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Token ${token}`
+                        }
+                    });
+                    showMessage('You have been logged out.', 'success');
+                } catch (error) {
+                    console.error('Logout API call failed (might be due to network or invalid token already):', error);
+                    // Still proceed with local logout even if API call fails
+                    showMessage('Logout failed on server, but you are logged out locally.', 'error');
+                } finally {
+                    localStorage.removeItem('authToken'); // Always clear token locally
+                    // Redirect to the login page
+                    window.location.href = "/"; 
+                }
+            } else {
+                // If no token exists, just redirect to login page
+                window.location.href = "/";
+            }
+        });
+
+        // Event listener for "Go to Planner" button
+        goToPlannerBtn.addEventListener('click', () => {
+            window.location.href = "/planner/";
+        });
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', checkAuthStatus);
+        toggleButton.addEventListener('click', () => toggleForms());
+
+        goToPlannerBtn.addEventListener('click', () => {
+    window.location.href = "/planner/";
+});
+
+    </script>
+</body>
+</html>

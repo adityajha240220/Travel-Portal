@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Travel Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: linear-gradient(135deg, #1b1d2e, #0f0f17);
+            --bg-light: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+            --text-dark: #ffffff;
+            --text-light: #1a1a1a;
+            --highlight: #f9a825; /* A vibrant orange-yellow */
+            --secondary-highlight: #03dac6; /* A teal color */
+            --accent-pink: #ff4081; /* Original pink for buttons */
+            --input-bg-dark: #292b3d;
+            --input-border-dark: #3f3f5b;
+            --card-bg-dark: rgba(47, 47, 71, 0.6);
+            --card-border-dark: rgba(255, 255, 255, 0.1);
+
+            /* Light mode variables */
+            --bg-light-mode: linear-gradient(135deg, #e0f2f7, #c1e4f2);
+            --text-light-mode: #333333;
+            --input-bg-light: #ffffff;
+            --input-border-light: #cccccc;
+            --card-bg-light: rgba(255, 255, 255, 0.8);
+            --card-border-light: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-dark);
+            background-size: 400% 400%;
+            animation: gradientMove 15s ease infinite;
+            color: var(--text-dark);
+            display: flex;
+            transition: background 0.5s ease, color 0.5s ease;
+            min-height: 100vh; /* Ensure body takes full viewport height */
+        }
+
+        body.light-mode {
+            background: var(--bg-light-mode);
+            color: var(--text-light-mode);
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .sidebar {
+            width: 300px;
+            background: linear-gradient(180deg, #2b2e4a, #1f1f2e);
+            padding: 20px;
+            box-sizing: border-box;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            position: sticky; /* Keeps sidebar in view */
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        body.light-mode .sidebar {
+            background: linear-gradient(180deg, #eaf6fa, #d0e7f0);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h2 {
+            margin-bottom: 20px;
+            color: var(--highlight);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar label {
+            display: block;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #e0e0e0;
+            transition: color 0.5s ease;
+        }
+
+        body.light-mode .sidebar label {
+            color: var(--text-light-mode);
+        }
+
+        .sidebar input[type="text"],
+        .sidebar input[type="password"],
+        .sidebar input[type="number"],
+        .sidebar select { /* Added select for consistent styling */
+            width: calc(100% - 20px); /* Adjust for padding */
+            padding: 10px;
+            background: var(--input-bg-dark);
+            border: 1px solid var(--input-border-dark);
+            color: var(--text-dark);
+            border-radius: 8px;
+            margin-top: 5px;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode .sidebar input,
+        body.light-mode .sidebar select {
+            background: var(--input-bg-light);
+            border: 1px solid var(--input-border-light);
+            color: var(--text-light-mode);
+        }
+
+        .sidebar input:focus,
+        .sidebar select:focus {
+            outline: none;
+            box-shadow: 0 0 8px var(--secondary-highlight);
+            border-color: var(--secondary-highlight);
+        }
+
+        .slider-container {
+            margin-top: 15px;
+        }
+
+        .slider-container input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none; /* Override default */
+            height: 8px;
+            border-radius: 5px;
+            background: #555;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+        }
+
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--highlight);
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        .slider-container input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--highlight);
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        .tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .tag {
+            background-color: var(--accent-pink);
+            padding: 5px 12px;
+            border-radius: 25px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            color: white;
+            user-select: none; /* Prevent text selection */
+        }
+
+        .tag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px var(--accent-pink);
+        }
+
+        .tag.active {
+            background-color: var(--secondary-highlight);
+            box-shadow: 0 0 10px var(--secondary-highlight);
+        }
+
+        .checkbox-tags {
+            display: flex;
+            flex-direction: column; /* Stack checkboxes vertically */
+            gap: 8px; /* Space between checkbox items */
+            margin-top: 10px;
+        }
+
+        .checkbox-tags label {
+            display: flex; /* Align checkbox and text */
+            align-items: center;
+            font-size: 14px;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            margin-top: 0; /* Override default label margin-top */
+        }
+        body.light-mode .checkbox-tags label {
+            color: var(--text-light-mode);
+        }
+
+        .checkbox-tags input[type="checkbox"] {
+            margin-right: 8px; /* Space between checkbox and text */
+            width: auto; /* Revert width for actual checkbox input */
+            padding: 0;
+            background: none;
+            border: 1px solid var(--input-border-dark);
+            -webkit-appearance: checkbox; /* Ensure standard checkbox appearance */
+            -moz-appearance: checkbox;
+            appearance: checkbox;
+            color: initial; /* Reset color */
+            border-radius: 0; /* Reset border-radius */
+            transition: none; /* Remove transitions */
+        }
+        body.light-mode .checkbox-tags input[type="checkbox"] {
+             border: 1px solid var(--input-border-light);
+        }
+
+
+        .main {
+            flex: 1;
+            padding: 40px;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .main h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            color: var(--highlight);
+            text-align: center;
+            text-shadow: 0 0 10px rgba(249, 168, 37, 0.5);
+        }
+
+        body.light-mode .main h1 {
+            color: var(--highlight);
+            text-shadow: none;
+        }
+
+        .main .info-box,
+        .main .dropdown,
+        #outputPlan,
+        .weather-box, .time-box, .image-box {
+            background: var(--card-bg-dark);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 25px; /* Slightly more padding */
+            border-radius: 15px; /* More rounded corners */
+            margin-bottom: 0px; /* Adjust spacing, gap handles it */
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--card-border-dark);
+            transition: all 0.5s ease;
+        }
+
+        body.light-mode .main .info-box,
+        body.light-mode .main .dropdown,
+        body.light-mode #outputPlan,
+        body.light-mode .weather-box, body.light-mode .time-box, body.light-mode .image-box {
+            background: var(--card-bg-light);
+            border: 1px solid var(--card-border-light);
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .main .info-box h3 {
+            margin: 0 0 10px 0;
+            color: var(--secondary-highlight);
+            font-size: 20px;
+        }
+
+        .main .info-box p {
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+        .main .info-box p strong {
+            color: var(--highlight);
+        }
+
+        .main .generate-btn,
+        .main .dropdown button,
+        .sidebar .logout-btn { /* Style for logout button */
+            background-color: var(--accent-pink);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 64, 129, 0.4);
+            margin-top: 10px; /* Spacing for multiple buttons */
+        }
+
+        .main .generate-btn:hover,
+        .main .dropdown button:hover,
+        .sidebar .logout-btn:hover { /* Hover for logout button */
+            background-color: #ff6584;
+            box-shadow: 0 0 15px var(--accent-pink);
+            transform: translateY(-2px);
+        }
+
+        .main .generate-btn:disabled,
+        .main .dropdown button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .main .dropdown input {
+            width: calc(100% - 20px);
+            background: var(--input-bg-dark);
+            border: 1px solid var(--input-border-dark);
+            color: var(--text-dark);
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        body.light-mode .main .dropdown input {
+            background: var(--input-bg-light);
+            border: 1px solid var(--input-border-light);
+            color: var(--text-light-mode);
+        }
+
+        .main .dropdown input:focus {
+            outline: none;
+            box-shadow: 0 0 8px var(--secondary-highlight);
+            border-color: var(--secondary-highlight);
+        }
+
+        .eye-toggle {
+            position: absolute;
+            right: 15px; /* Adjust right position for padding */
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #aaa;
+            transition: color 0.3s ease;
+        }
+
+        .eye-toggle:hover {
+            color: white;
+        }
+
+        body.light-mode .eye-toggle {
+            color: #666;
+        }
+        body.light-mode .eye-toggle:hover {
+            color: #333;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        #outputPlan {
+            min-height: 200px;
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+            background: var(--card-bg-dark); /* Ensure consistent background */
+            border: 1px solid var(--card-border-dark);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            border-radius: 10px;
+            white-space: pre-wrap; /* Maintains formatting */
+            overflow-wrap: break-word; /* Breaks long words */
+            transition: background 0.5s ease, border 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        .download-btn {
+            margin-top: 15px;
+            background-color: var(--secondary-highlight);
+            border: none;
+            color: #000; /* Changed to black for better contrast on teal */
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(3, 218, 198, 0.4);
+        }
+
+        .download-btn:hover {
+            background-color: #26ffe6;
+            box-shadow: 0 0 15px var(--secondary-highlight);
+            transform: translateY(-2px);
+        }
+
+        .download-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .spinner {
+            display: none;
+            margin: 20px auto;
+            border: 6px solid rgba(255, 255, 255, 0.3);
+            border-top: 6px solid var(--highlight);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .icon-animated {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .icon-animated:hover {
+            transform: rotate(15deg) scale(1.2);
+        }
+
+        #modeToggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: 2px solid var(--highlight);
+            color: var(--highlight);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 101;
+            transition: all 0.3s ease;
+        }
+
+        #modeToggle:hover {
+            background: var(--highlight);
+            color: var(--text-dark);
+            box-shadow: 0 0 10px var(--highlight);
+        }
+
+        body.light-mode #modeToggle {
+            border: 2px solid var(--accent-pink);
+            color: var(--accent-pink);
+        }
+        body.light-mode #modeToggle:hover {
+            background: var(--accent-pink);
+            color: white;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            margin-top: 15px;
+        }
+
+        .user-info {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info p {
+            margin: 0;
+            font-size: 16px;
+            color: #e0e0e0;
+        }
+
+        .user-info p strong {
+            color: var(--secondary-highlight);
+            font-size: 18px;
+        }
+
+        body.light-mode .user-info p {
+            color: var(--text-light-mode);
+        }
+    </style>
+</head>
+<body>
+    <button id="modeToggle">Toggle Light/Dark Mode</button>
+    <div class="sidebar">
+        <div class="user-info">
+            <p>Welcome, <strong id="usernameDisplay">Guest</strong>!</p>
+            <button class="logout-btn" id="logoutButton" style="display: none;">Logout</button>
+        </div>
+        <h2><span class="icon-animated">✈️</span> Trip Settings</h2>
+
+        <label for="source">📍 From</label>
+        <input type="text" id="source" placeholder="e.g., Paris, Tokyo, Himalayas">
+
+        <label for="destination">📍 Where would you like to go?</label>
+        <input type="text" id="destination" placeholder="e.g., Paris, Tokyo, Himalayas">
+
+        <label for="duration">⏱️ How many days?</label>
+        <input type="number" id="duration" value="5" min="1">
+
+        <label for="currency">💱 Select Currency</label>
+        <select id="currency" onchange="updateBudgetLabel()">
+            <option value="₹">₹</option>
+            <option value="$">$</option>
+            <option value="€">€</option>
+            <option value="£">£</option>
+        </select>
+
+        <label for="budget">💰 What's your total budget?</label>
+        <div class="slider-container">
+            <input type="range" id="budget" min="10000" max="1000000" step="10000" value="50000" oninput="updateBudgetLabel()">
+            <div id="budgetLabel">₹ 50,000</div>
+        </div>
+
+        <label>🎒 Travel Style</label>
+        <div class="tags" id="styleTags">
+            <div class="tag active" onclick="toggleTag(this)">Culture</div>
+            <div class="tag active" onclick="toggleTag(this)">Nature</div>
+            <div class="tag" onclick="toggleTag(this)">Adventure</div>
+            <div class="tag" onclick="toggleTag(this)">Relaxation</div>
+            <div class="tag" onclick="toggleTag(this)">Foodie</div>
+            <div class="tag" onclick="toggleTag(this)">History</div>
+            <div class="tag" onclick="toggleTag(this)">Nightlife</div>
+        </div>
+
+        <label>🧳 Trip Checklist</label>
+        <div class="checkbox-tags">
+            <label><input type="checkbox" onchange="saveChecklist(this)"> Passport</label>
+            <label><input type="checkbox" onchange="saveChecklist(this)"> Tickets</label>
+            <label><input type="checkbox" onchange="saveChecklist(this)"> Charger</label>
+            <label><input type="checkbox" onchange="saveChecklist(this)"> Sunscreen</label>
+            <label><input type="checkbox" onchange="saveChecklist(this)"> Adapter</label>
+            <label><input type="checkbox" onchange="saveChecklist(this)"> Medications</label>
+        </div>
+    </div>
+
+    <div class="main">
+        <h1><span class="icon-animated">🌍</span> AI Travel Planner</h1>
+
+        <div class="info-box">
+            <h3>Welcome to your personal AI Travel Assistant! ✨</h3>
+            <p>Let me help you create your perfect travel itinerary based on your preferences. Simply fill out the sidebar settings and click "Generate".</p>
+            <p><strong>Destination:</strong> <span id="outputDestination">Not set</span></p>
+            <p><strong>Duration:</strong> <span id="outputDuration">5 days</span></p>
+            <p><strong>Budget:</strong> <span id="outputBudget">₹ 50,000</span></p>
+            <p><strong>Travel Styles:</strong> <span id="selectedStyles">Culture, Nature</span></p>
+        </div>
+
+        <div class="spinner" id="spinner"></div>
+
+        <button class="generate-btn" id="generateButton" onclick="generatePlan()">✨ Generate My Perfect Travel Plan</button>
+
+        <div id="outputPlan">
+            Your generated travel plan will appear here.
+        </div>
+        <button class="download-btn" id="downloadButton" onclick="downloadPlan()">📄 Download Plan as PDF</button>
+
+        <div class="dropdown">
+            <label for="travelQuestion">💬 Ask a specific question about your destination or travel plan:</label>
+            <input list="suggestions" id="travelQuestion" placeholder="e.g., What are the best local markets?">
+            <datalist id="suggestions">
+                <option value="What are the must-see places?">
+                <option value="What local food should I try?">
+                <option value="Is it safe to travel there now?">
+                <option value="What’s the weather like?">
+                <option value="Are there cultural customs to follow?">
+                <option value="What are the best hidden gems?">
+                <option value="How to get around?">
+            </datalist>
+            <div class="button-group">
+                <button id="speakButton" onclick="speakText()">🔊 Read Plan</button>
+                <button id="stopSpeakingButton" onclick="stopSpeaking()">🛑 Stop Reading</button>
+                <button id="listenButton" onclick="startListening()">🎙️ Speak Question</button>
+                <button id="askQuestionButton" onclick="askQuestion()">❓ Get Answer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const synth = window.speechSynthesis;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+
+    if (recognition) {
+        recognition.continuous = false;
+        recognition.lang = 'en-US';
+    }
+
+    // --- API Base URL (Crucial for API calls) ---
+    // for auth actions:
+const AUTH_API_BASE = 'http://127.0.0.1:8000/api';
+
+// for planner actions:
+const PLANNER_API_BASE = 'http://127.0.0.1:8000/planner';
+
+
+
+    // --- DOM Elements for the planner page greeting and logout ---
+    const usernameDisplay = document.getElementById('usernameDisplay');
+    const logoutButton = document.getElementById('logoutButton');
+    const generateButton = document.getElementById('generateButton');
+    const downloadButton = document.getElementById('downloadButton');
+    const speakButton = document.getElementById('speakButton');
+    const stopSpeakingButton = document.getElementById('stopSpeakingButton');
+    const listenButton = document.getElementById('listenButton');
+    const askQuestionButton = document.getElementById('askQuestionButton');
+
+    /**
+     * Updates the greeting on the planner page.
+     * @param {object|null} user - The user object if logged in, null otherwise.
+     */
+    function updateUsernameAndLogoutButton(user) {
+        console.log("updateUsernameAndLogoutButton called with user:", user);
+        if (user && (user.full_name || user.email)) {
+            usernameDisplay.textContent = user.full_name || user.email;
+            logoutButton.style.display = 'inline-block'; // Show logout button
+            console.log("User logged in. Displaying:", user.full_name || user.email);
+        } else {
+            usernameDisplay.textContent = 'Guest';
+            logoutButton.style.display = 'none'; // Hide logout button
+            console.log("User not logged in or generatePlan()profile fetch failed. Showing 'Guest'.");
+        }
+    }
+
+    /**
+     * Checks authentication status and fetches user profile for the planner page.
+     */
+    async function checkAuthStatus() {
+        console.log("checkAuthStatus started.");
+        const token = localStorage.getItem('authToken');
+        console.log("Token from localStorage:", token);
+
+        if (!token) {
+            console.log("No token found in localStorage.");
+            updateUsernameAndLogoutButton(null); // No token, show guest
+            return;
+        }
+
+        try {
+            const response = await fetch(`${AUTH_API_BASE}/profile/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Token ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log("Profile API response:", data);
+                updateUsernameAndLogoutButton(data); // Update greeting with user data
+            } else {
+                const errorText = await response.text();
+                console.error('Failed to fetch user profile:', response.status, errorText);
+                localStorage.removeItem('authToken'); // Clear invalid token
+                updateUsernameAndLogoutButton(null);
+            }
+        } catch (error) {
+            console.error('Network error during profile fetch:', error);
+            localStorage.removeItem('authToken'); // Clear token on network error
+            updateUsernameAndLogoutButton(null);
+        }
+    }
+
+    /**
+     * Handles user logout from the planner page.
+     */
+    logoutButton.addEventListener('click', async function() {
+        console.log("Logout button clicked.");
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            try {
+                const response = await fetch(`${AUTH_API_BASE}/logout/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Token ${token}`
+                    }
+                });
+                if (response.ok) {
+                    console.log("Logout successful on backend.");
+                } else {
+                    const errorText = await response.text();
+                    console.error('Logout API call failed:', response.status, errorText);
+                }
+            } catch (error) {
+                console.error('Network error during logout API call:', error);
+            } finally {
+                localStorage.removeItem('authToken'); // Always clear token locally
+                console.log("Token removed from localStorage. Redirecting to /.");
+                window.location.href = "/"; // Redirect to the login page (root)
+            }
+        } else {
+            console.log("No token found, redirecting directly to /.");
+            window.location.href = "/"; // Already logged out, just redirect
+        }
+    });
+
+    /**
+     * Updates the budget label and info box display.
+     */
+    function updateBudgetLabel() {
+        const budgetSlider = document.getElementById('budget');
+        const currencySelect = document.getElementById('currency');
+        const budgetLabel = document.getElementById('budgetLabel');
+        const selectedCurrency = currencySelect.value;
+        const value = parseInt(budgetSlider.value).toLocaleString('en-IN'); // Format with commas
+        budgetLabel.textContent = `${selectedCurrency} ${value}`;
+        document.getElementById('outputBudget').textContent = `${selectedCurrency} ${value}`; // Update info box
+    }
+
+    /**
+     * Toggles the active state of a travel style tag.
+     * @param {HTMLElement} element - The div element representing the tag.
+     */
+    function toggleTag(element) {
+        element.classList.toggle('active');
+        updateSelectedStyles();
+    }
+
+    /**
+     * Updates the displayed selected travel styles in the info box.
+     */
+    function updateSelectedStyles() {
+        const selectedTags = Array.from(document.querySelectorAll('#styleTags .tag.active'))
+                               .map(tag => tag.textContent)
+                               .join(', ');
+        document.getElementById('selectedStyles').textContent = selectedTags || 'None selected';
+    }
+
+    /**
+     * Saves the state of checklist checkboxes to local storage.
+     * @param {HTMLInputElement} checkbox - The checkbox that triggered the change.
+     */
+    function saveChecklist(checkbox) {
+        const checklistItems = document.querySelectorAll('.checkbox-tags input[type="checkbox"]');
+        const savedStates = {};
+        checklistItems.forEach(item => {
+            // Use the text content of the label associated with the checkbox
+            const label = item.parentElement;
+            const itemName = label.textContent.trim();
+            savedStates[itemName] = item.checked;
+        });
+        localStorage.setItem('travelChecklist', JSON.stringify(savedStates));
+    }
+
+    /**
+     * Loads the state of checklist checkboxes from local storage.
+     */
+    function loadChecklist() {
+        const savedStates = JSON.parse(localStorage.getItem('travelChecklist') || '{}');
+        const checklistItems = document.querySelectorAll('.checkbox-tags input[type="checkbox"]');
+        checklistItems.forEach(item => {
+            const label = item.parentElement;
+            const itemName = label.textContent.trim();
+            if (savedStates.hasOwnProperty(itemName)) {
+                item.checked = savedStates[itemName];
+            }
+        });
+    }
+
+    // --- UPDATED generatePlan FUNCTION ---
+    async function generatePlan() {
+        const spinner = document.getElementById('spinner');
+        const outputPlan = document.getElementById('outputPlan');
+
+        spinner.style.display = 'block';
+        generateButton.disabled = true;
+        downloadButton.disabled = true;
+        speakButton.disabled = true;
+        askQuestionButton.disabled = true;
+
+        outputPlan.textContent = 'Generating your travel plan... please wait.';
+
+        const destination = document.getElementById('destination')?.value.trim();
+        const source = document.getElementById('source')?.value.trim();
+        const duration = document.getElementById('duration')?.value || '5';
+        const budget = document.getElementById('budgetLabel')?.textContent || '₹ 50,000';
+        const selectedStylesText = document.getElementById('selectedStyles')?.textContent;
+
+        if (!destination) {
+            alert('Please enter a destination.');
+            spinner.style.display = 'none';
+            generateButton.disabled = false;
+            downloadButton.disabled = false;
+            speakButton.disabled = false;
+            askQuestionButton.disabled = false;
+            outputPlan.textContent = 'Please enter a destination to generate a plan.';
+            return;
+        }
+
+        // Get the authentication token from local storage
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            alert('You must be logged in to generate a travel plan. Please log in.');
+            spinner.style.display = 'none';
+            generateButton.disabled = false;
+            downloadButton.disabled = false;
+            speakButton.disabled = false;
+            askQuestionButton.disabled = false;
+            outputPlan.textContent = 'Authentication required. Please log in.';
+            // Optionally, redirect to login page if desired
+            // window.location.href = "/";
+            return;
+        }
+
+        try {
+            const res = await fetch(`${PLANNER_API_BASE}/generate-plan/`, {
+
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Token ${token}` // ✅ ADDED THIS LINE
+                },
+                body: JSON.stringify({
+                    source,
+                    destination,
+                    duration,
+                    budget,
+                    styles: selectedStylesText
+                })
+            });
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                // Check for 401 specifically
+                if (res.status === 401) {
+                    alert('Session expired or invalid. Please log in again.');
+                    localStorage.removeItem('authToken'); // Clear invalid token
+                    window.location.href = "/"; // Redirect to login
+                }
+                throw new Error(`Backend Error: ${res.status} - ${errorText}`);
+            }
+
+            const data = await res.json();
+            const plan = data.plan || 'Failed to generate plan. Please try again.';
+            outputPlan.textContent = plan;
+        } catch (err) {
+            console.error('Error generating travel plan:', err);
+            outputPlan.textContent = `Failed to generate travel plan: ${err.message}. Please try again.`;
+            alert(`Failed to generate travel plan: ${err.message}`);
+        } finally {
+            spinner.style.display = 'none';
+            generateButton.disabled = false;
+            downloadButton.disabled = false;
+            speakButton.disabled = false;
+            askQuestionButton.disabled = false;
+        }
+
+        document.getElementById('outputDestination').textContent = destination || 'Not set';
+        document.getElementById('outputDuration').textContent = duration + ' days';
+        // Budget display is already handled by updateBudgetLabel
+    }
+
+    async function downloadPlan() {
+        const text = document.getElementById('outputPlan').textContent;
+
+        if (!text || text === 'Your generated travel plan will appear here.' || text.startsWith('Generating') || text.startsWith('Failed')) {
+            alert('No plan to download yet. Please generate a plan first.');
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const lines = doc.splitTextToSize(text, 180); // wrap text within 180 width
+
+        doc.setFont("helvetica");
+        doc.setFontSize(12);
+        doc.text(lines, 10, 20);
+
+        doc.save("ai_travel_plan.pdf");
+    }
+
+    function speakText() {
+        if (synth.speaking) {
+            synth.cancel();
+        }
+
+        const text = document.getElementById('outputPlan').textContent;
+        if (!text || text === 'Your generated travel plan will appear here.' || text.startsWith('Generating your travel plan') || text.startsWith('Failed to generate')) {
+            alert('There is no plan to read aloud yet. Please generate a plan first.');
+            return;
+        }
+
+        speakButton.disabled = true; // Disable speak button
+        stopSpeakingButton.disabled = false; // Enable stop button
+
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'en-US';
+        utter.rate = 1.0;
+        utter.pitch = 1.0;
+
+        utter.onerror = (event) => {
+            console.error('SpeechSynthesisUtterance error:', event.error);
+            alert('Speech synthesis failed. Your browser might not support it, or there was an error with the text.');
+            speakButton.disabled = false;
+            stopSpeakingButton.disabled = true;
+        };
+        utter.onend = () => {
+            console.log('Speech synthesis ended.');
+            speakButton.disabled = false;
+            stopSpeakingButton.disabled = true;
+        };
+
+        synth.speak(utter);
+    }
+
+    function stopSpeaking() {
+        if (synth.speaking) {
+            synth.cancel();
+        }
+        speakButton.disabled = false;
+        stopSpeakingButton.disabled = true;
+    }
+
+    function startListening() {
+        if (!recognition) {
+            alert('Speech Recognition not supported in this browser. Try Chrome or Edge.');
+            return;
+        }
+        document.getElementById('travelQuestion').value = 'Listening...';
+        listenButton.disabled = true; // Disable listen button during listening
+        recognition.start();
+
+        recognition.onresult = (e) => {
+            const transcript = e.results[0][0].transcript;
+            document.getElementById('travelQuestion').value = transcript;
+            console.log('Speech recognized:', transcript);
+        };
+
+        recognition.onerror = (e) => {
+            console.error('Speech recognition error:', e.error);
+            document.getElementById('travelQuestion').value = 'Error listening. Try again.';
+            if (e.error === 'not-allowed') {
+                alert('Microphone access denied. Please allow microphone access in your browser settings.');
+            } else {
+                alert(`Speech recognition error: ${e.error}`);
+            }
+            listenButton.disabled = false;
+        };
+
+        recognition.onend = () => {
+            console.log('Speech recognition ended.');
+            if (document.getElementById('travelQuestion').value === 'Listening...') {
+                document.getElementById('travelQuestion').value = ''; // Clear if nothing was heard
+            }
+            listenButton.disabled = false;
+        };
+    }
+
+    // --- UPDATED askQuestion FUNCTION ---
+    async function askQuestion() {
+        const travelQuestionInput = document.getElementById('travelQuestion');
+        const travelQuestion = travelQuestionInput.value.trim();
+        const currentPlan = document.getElementById('outputPlan').textContent.trim();
+        const spinner = document.getElementById('spinner');
+        const outputPlan = document.getElementById('outputPlan');
+
+        if (!travelQuestion || travelQuestion === 'Listening...' || travelQuestion === 'Error listening. Try again.') {
+            alert('Please type or speak your question first.');
+            return;
+        }
+
+        if (!currentPlan || currentPlan === 'Your generated travel plan will appear here.' || currentPlan.startsWith('Generating your travel plan') || currentPlan.startsWith('Failed to generate')) {
+            alert('Please generate a travel plan first before asking questions about it.');
+            return;
+        }
+
+        spinner.style.display = 'block';
+        // Disable buttons during API call
+        generateButton.disabled = true;
+        downloadButton.disabled = true;
+        speakButton.disabled = true;
+        listenButton.disabled = true;
+        askQuestionButton.disabled = true;
+
+
+        const originalOutputPlanContent = outputPlan.textContent;
+
+        outputPlan.textContent = 'Getting an answer...';
+
+        // Get the authentication token from local storage
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            alert('You must be logged in to ask questions. Please log in.');
+            spinner.style.display = 'none';
+            generateButton.disabled = false;
+            downloadButton.disabled = false;
+            speakButton.disabled = false;
+            listenButton.disabled = false;
+            askQuestionButton.disabled = false;
+            outputPlan.textContent = 'Authentication required. Please log in. ' + originalOutputPlanContent; // Restore original content
+            // Optionally, redirect to login page if desired
+            // window.location.href = "/";
+            return;
+        }
+
+        try {
+            const res = await fetch(`${PLANNER_API_BASE}/ask-question/`, {
+
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Token ${token}` // ✅ ADDED THIS LINE
+                },
+                body: JSON.stringify({
+                    question: travelQuestion,
+                    plan: currentPlan
+                })
+            });
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                if (res.status === 401) {
+                    alert('Session expired or invalid. Please log in again.');
+                    localStorage.removeItem('authToken');
+                    window.location.href = "/";
+                }
+                throw new Error(`Backend Error: ${res.status} - ${errorText}`);
+            }
+
+            const data = await res.json();
+            const answer = data.answer || 'Sorry, I could not find an answer to that question.';
+            outputPlan.textContent = `Question: "${travelQuestion}"\n\nAnswer: ${answer}\n\n--- (Original Plan Below) ---\n${originalOutputPlanContent}`;
+            travelQuestionInput.value = '';
+
+        } catch (err) {
+            console.error('Error asking question:', err);
+            outputPlan.textContent = `Error getting answer: ${err.message}. Please try again. \n\n--- (Original Plan Below) ---\n${originalOutputPlanContent}`;
+            alert(`Error getting answer: ${err.message}`);
+        } finally {
+            spinner.style.display = 'none';
+            // Re-enable buttons
+            generateButton.disabled = false;
+            downloadButton.disabled = false;
+            speakButton.disabled = false;
+            listenButton.disabled = false;
+            askQuestionButton.disabled = false;
+        }
+    }
+
+    // Initial calls
+    document.addEventListener('DOMContentLoaded', () => {
+        checkAuthStatus(); // Call on page load to check login status
+        updateBudgetLabel();
+        updateSelectedStyles();
+        loadChecklist(); // Load saved checklist states
+    });
+
+    // Dark/Light Mode Toggle
+    const modeToggle = document.getElementById('modeToggle');
+    const body = document.body;
+
+    // Load saved mode preference
+    if (localStorage.getItem('theme') === 'light-mode') {
+        body.classList.add('light-mode');
+    }
+
+    modeToggle.addEventListener('click', () => {
+        body.classList.toggle('light-mode');
+        // Save preference to localStorage
+        if (body.classList.contains('light-mode')) {
+            localStorage.setItem('theme', 'light-mode');
+        } else {
+            localStorage.removeItem('theme'); // Or set 'dark-mode'
+        }
+    });
+
+</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</body>
+</html>

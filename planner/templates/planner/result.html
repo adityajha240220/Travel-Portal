@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Plan Result</title>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .travel-plan, #answer { margin-top: 20px; white-space: pre-wrap; }
+    form input[type="text"] { width: 60%; padding: 8px; }
+    form button { padding: 8px 16px; }
+  </style>
+</head>
+<body>
+
+  <h2>Your Travel Plan for {{ destination }}</h2>
+
+  {% if summary %}
+    <h3>About {{ destination }}</h3>
+    <p>{{ summary }}</p>
+  {% endif %}
+
+  <div class="travel-plan">
+    {{ travel_plan|linebreaksbr }}
+  </div>
+
+  <hr>
+  <h3>Have a Question?</h3>
+  <form method="post" action="{% url 'planner:ask-question' %}" id="qa-form">
+    {% csrf_token %}
+    <input type="text" name="question" placeholder="Ask about your trip..." required>
+    <input type="hidden" name="destination" value="{{ destination }}">
+    <input type="hidden" name="plan" value="{{ travel_plan }}">
+    <button type="submit">Get Answer</button>
+  </form>
+
+  <div id="answer"></div>
+
+  <script>
+    const form = document.getElementById("qa-form");
+    const answerBox = document.getElementById("answer");
+
+    form.onsubmit = async function(e) {
+      e.preventDefault();
+      const formData = new FormData(form);
+
+      answerBox.innerHTML = "⏳ Loading...";
+
+      try {
+        const res = await fetch("{% url 'planner:ask-question' %}", {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": form.querySelector('[name=csrfmiddlewaretoken]').value
+          },
+          body: formData
+        });
+
+        const data = await res.json();
+        answerBox.innerHTML = data.answer 
+          ? `<p><strong>Answer:</strong> ${data.answer}</p>` 
+          : `<p style="color:red;">${data.error}</p>`;
+        
+        form.reset();
+      } catch (err) {
+        answerBox.innerHTML = `<p style="color:red;">Error contacting server.</p>`;
+      }
+    };
+  </script>
+
+</body>
+</html>
