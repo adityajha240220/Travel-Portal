@@ -1,5 +1,5 @@
-.env/
+.env
 .vscode/
 travel/
-db.sqlite3/
+db.sqlite3
 __pycache__/
