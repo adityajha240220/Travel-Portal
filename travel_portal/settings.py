@@ -159,7 +159,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     # Add any other origins where your frontend might be running (e.g., "http://localhost:3000")
     # Add your Render domain here, as it's the host from which your frontend (if separate) or API will be accessed.
-    "https://travel-portal-1.onrender.com",
+    "https://travel-portal-2.onrender.com",
     # If you have a separate frontend on Render or another host, add its URL here:
     # "https://your-separate-frontend-app.onrender.com",
     # "https://your-custom-frontend-domain.com",

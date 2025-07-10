@@ -3,7 +3,7 @@
 
 services:
   - type: web
-    name: travel-portal # <<--- YAHAN APNI RENDER SERVICE KA SAHI NAAM LIKHNA
+    name: travel-portal-2 # <<--- YAHAN APNI RENDER SERVICE KA SAHI NAAM LIKHNA
     env: python
     
     # Python version specify karein.
@@ -20,13 +20,13 @@ services:
     # Environment Variables (Optional: aap inhein Render UI mein bhi rakh sakte hain)
     # Agar aap yahan dete hain, toh Render UI wale variables override ho jayenge.
     envVars:
-      - key: SECRET_KEY
+      - key: DJANGO_SECRET_KEY
         sync: false # 'true' karne par Render khud generate karega
-        value: your-strong-secret-key-for-production # <--- YAHAN APNI REAL SECRET KEY DALEIN
+        value: (zvwt#38w+(u6&2#!&bpim2je6_)xs_!cnbx90+@$shy%&6fip # <--- YAHAN APNI REAL SECRET KEY DALEIN
       - key: DEBUG
         value: "False" # <--- Production ke liye hamesha False
       - key: ALLOWED_HOSTS
-        value: 127.0.0.1,localhost,travel-portal.onrender.com # <--- Aapke Allowed Hosts
+        value: 127.0.0.1,localhost,travel-portal-2.onrender.com # <--- Aapke Allowed Hosts
       # Agar aap database use kar rahe hain (PostgreSQL), toh isko uncomment karein:
       # - key: DATABASE_URL
       #   fromDatabase: your-render-database-name # <<--- YAHAN APNE RENDER DB KA NAAM DALEIN
