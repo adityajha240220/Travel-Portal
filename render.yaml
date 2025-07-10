@@ -3,30 +3,35 @@
 
 services:
   - type: web
-    name: travel-portal-2 # <<--- YAHAN APNI RENDER SERVICE KA SAHI NAAM LIKHNA
+    name: travel-portal-2 
     env: python
     
-    # Python version specify karein.
-    # Python 3.13 mein 'pkgutil.ImpImporter' hata diya gaya hai.
-    # 3.11.9 ya 3.10.14 jaise stable versions hi use karein.
     pythonVersion: 3.11.9 
     
+    # Pre-Build Command: System dependencies install karega jo Python packages ke liye chahiye
+    preBuild: |
+      apt-get update -y
+      apt-get install -y portaudio19-dev
+      # For 'tokenizers' error, sometimes a newer pip helps, or explicitly using wheels
+      # The read-only error is trickier, try pinning tokenizers or removing it if not strictly needed
+      # Let's try installing Rust toolchain, though it might increase build time significantly
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+      export PATH="/root/.cargo/bin:$PATH"
+      
     # Build Command: Packages install karega aur static files collect karega.
     buildCommand: pip install --upgrade pip setuptools wheel && pip install -r requirements.txt && python manage.py collectstatic
     
     # Start Command: Production server (Gunicorn) se app ko start karega.
     startCommand: gunicorn travel_portal.wsgi:application 
     
-    # Environment Variables (Optional: aap inhein Render UI mein bhi rakh sakte hain)
-    # Agar aap yahan dete hain, toh Render UI wale variables override ho jayenge.
     envVars:
       - key: DJANGO_SECRET_KEY
-        sync: false # 'true' karne par Render khud generate karega
-        value: (zvwt#38w+(u6&2#!&bpim2je6_)xs_!cnbx90+@$shy%&6fip # <--- YAHAN APNI REAL SECRET KEY DALEIN
+        sync: false
+        value: (zvwt#38w+(u6&2#!&bpim2je6_)xs_!cnbx90+@$shy%&6fip
       - key: DEBUG
-        value: "False" # <--- Production ke liye hamesha False
+        value: "False" 
       - key: ALLOWED_HOSTS
-        value: 127.0.0.1,localhost,travel-portal-2.onrender.com # <--- Aapke Allowed Hosts
+        value: 127.0.0.1,localhost,travel-portal-2.onrender.com 
       # Agar aap database use kar rahe hain (PostgreSQL), toh isko uncomment karein:
       # - key: DATABASE_URL
-      #   fromDatabase: your-render-database-name # <<--- YAHAN APNE RENDER DB KA NAAM DALEIN
+      #   fromDatabase: your-render-database-name
