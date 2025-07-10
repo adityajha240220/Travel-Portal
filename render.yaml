@@ -1,0 +1,32 @@
+# render.yaml
+# Aapki Django web service ke liye Render configuration
+
+services:
+  - type: web
+    name: travel-portal-1 # <<--- YAHAN APNI RENDER SERVICE KA SAHI NAAM LIKHNA
+    env: python
+    
+    # Python version specify karein.
+    # Python 3.13 mein 'pkgutil.ImpImporter' hata diya gaya hai.
+    # 3.11.9 ya 3.10.14 jaise stable versions hi use karein.
+    pythonVersion: 3.11.9 
+    
+    # Build Command: Packages install karega aur static files collect karega.
+    buildCommand: pip install --upgrade pip setuptools wheel && pip install -r requirements.txt && python manage.py collectstatic
+    
+    # Start Command: Production server (Gunicorn) se app ko start karega.
+    startCommand: gunicorn travel_portal.wsgi:application 
+    
+    # Environment Variables (Optional: aap inhein Render UI mein bhi rakh sakte hain)
+    # Agar aap yahan dete hain, toh Render UI wale variables override ho jayenge.
+    envVars:
+      - key: SECRET_KEY
+        sync: false # 'true' karne par Render khud generate karega
+        value: your-strong-secret-key-for-production # <--- YAHAN APNI REAL SECRET KEY DALEIN
+      - key: DEBUG
+        value: "False" # <--- Production ke liye hamesha False
+      - key: ALLOWED_HOSTS
+        value: 127.0.0.1,localhost,travel-portal-1.onrender.com # <--- Aapke Allowed Hosts
+      # Agar aap database use kar rahe hain (PostgreSQL), toh isko uncomment karein:
+      # - key: DATABASE_URL
+      #   fromDatabase: your-render-database-name # <<--- YAHAN APNE RENDER DB KA NAAM DALEIN
