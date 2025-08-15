@@ -439,21 +439,21 @@
 
             try {
                 const res = await fetch(`${AUTH_API_BASE}/register/`, {
-                    method: 'POST',
+                   method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        full_name: fullName,
-                        email: email,
-                        phone_number: phoneNumber,
-                        password: password
+                              'Content-Type': 'application/json',
+                            },
+                             body: JSON.stringify({
+                             full_name: fullName,
+                             email: email,
+                             phone_number: phoneNumber,
+                             password: password
                     })
                 });
 
-                const data = await response.json();
+                    const data = await res.json(); // ✅ Correct
 
-                if (response.ok) {
+                if (res.ok) {
                     showMessage('Registration successful! Please log in.', 'success');
                     toggleForms(true); // Switch to login form after successful registration
                 } else {

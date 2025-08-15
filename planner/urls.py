@@ -4,7 +4,8 @@ from .views import (
     PlannerPageView,
     ResultPageView,
     GeneratePlanView,
-    AskQuestionView
+    AskQuestionView,
+    LiveDealsView
 )
 
 app_name = 'planner'
@@ -17,4 +18,5 @@ urlpatterns = [
     path('result-page/', ResultPageView.as_view(), name='result-page'),
     path('generate-plan/', GeneratePlanView.as_view(), name='generate-plan'),
     path('ask-question/', AskQuestionView.as_view(), name='ask-question'),
+    path('live-deals/', LiveDealsView.as_view(), name='live-deals'),
 ]

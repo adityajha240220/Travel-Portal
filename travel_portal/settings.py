@@ -45,6 +45,8 @@ if DEBUG:
         ALLOWED_HOSTS.append('127.0.0.1')
     if 'localhost' not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append('localhost')
+    if 'travel-portal-2.onrender.com' not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append('travel-portal-2.onrender.com')
 
 # !!! TEMPORARY DEBUGGING: Print the final ALLOWED_HOSTS list to Render logs !!!
 # Deploy with this line, check your Render logs, then REMOVE THIS LINE.
