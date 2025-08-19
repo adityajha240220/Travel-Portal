@@ -5,7 +5,7 @@ from accounts.views import LoginPageView  # ✅ Use your custom login view
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # Auth APIs
+    # Auth APIs (direct mapping to match Next.js proxy)
     path('api/', include(('accounts.urls', 'accounts'), namespace='accounts')),
 
     # Root login page (at '/')

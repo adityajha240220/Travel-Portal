@@ -3,6 +3,12 @@
 import os
 import sys
 
+# This code adds the 'apps' directory to the Python path
+# so Django can find your apps (e.g., 'accounts', 'planner')
+# even when they are nested.
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(PROJECT_ROOT, 'apps'))
+
 
 def main():
     """Run administrative tasks."""

@@ -164,7 +164,36 @@
             background-position: center center;
             background-image: url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1920&q=80');
         }
-        
+
+        .navbar-right {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 101;
+        }
+
+        #modeToggle, .logout-btn {
+            background: transparent;
+            border: 2px solid var(--highlight);
+            color: var(--highlight);
+            padding: 10px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+
+        #modeToggle:hover, .logout-btn:hover {
+            background: var(--highlight);
+            color: var(--text-secondary);
+            box-shadow: 0 0 10px var(--highlight);
+            transform: translateY(-2px);
+        }
+
         .sidebar {
             width: 300px;
             background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 80%, black));
@@ -178,15 +207,13 @@
             left: 0;
             z-index: 100;
         }
-        
-        /* Making sure dark theme sidebars are slightly transparent to see the background */
+
         .sidebar,
         .main .info-box,
         .main .dropdown,
         .main .booking-links-section,
         .main .live-prices-section,
         .main .budget-summary-section,
-        .main .itinerary-section,
         .price-card {
             background: var(--bg-secondary);
             backdrop-filter: var(--glass-blur);
@@ -265,7 +292,7 @@
             box-shadow: 0 0 5px var(--shadow-color);
             transition: background 0.3s ease, transform 0.3s ease;
         }
-        
+
         .tags {
             display: flex;
             gap: 10px;
@@ -283,17 +310,17 @@
             color: var(--text-secondary);
             user-select: none;
         }
-        
+
         .tag:hover {
             transform: scale(1.05);
             box-shadow: 0 0 10px var(--secondary-highlight);
         }
-        
+
         .tag.active {
             background-color: var(--highlight);
             box-shadow: 0 0 10px var(--highlight);
         }
-        
+
         .checkbox-tags {
             display: flex;
             flex-direction: column;
@@ -324,7 +351,7 @@
             border-radius: 0;
             transition: none;
         }
-        
+
         .main {
             flex: 1;
             padding: 40px;
@@ -356,7 +383,7 @@
             text-shadow: 0 0 10px color-mix(in srgb, var(--highlight) 50%, transparent);
             font-weight: 800;
         }
-        
+
         .main .info-box:hover,
         .main .dropdown:hover,
         .main .booking-links-section:hover,
@@ -366,26 +393,25 @@
             transform: translateY(-5px);
             box-shadow: 0 15px 50px 0 var(--shadow-color);
         }
-        
+
         .main .info-box h3 {
             margin: 0 0 10px 0;
             color: var(--secondary-highlight);
             font-size: 22px;
         }
-        
+
         .main .info-box p {
             margin-bottom: 5px;
             font-size: 15px;
             color: var(--text-primary);
         }
-        
+
         .main .info-box p strong {
             color: var(--highlight);
         }
 
         .generate-btn,
         .dropdown .button-group button,
-        .sidebar .logout-btn,
         .booking-links-section .link-group .booking-btn,
         .download-btn {
             background-color: var(--accent);
@@ -403,7 +429,6 @@
 
         .generate-btn:hover,
         .dropdown .button-group button:hover,
-        .sidebar .logout-btn:hover,
         .booking-links-section .link-group .booking-btn:hover,
         .download-btn:hover {
             background-color: color-mix(in srgb, var(--accent) 80%, white);
@@ -428,7 +453,7 @@
             box-shadow: none;
             transform: none;
         }
-        
+
         .dropdown .button-group {
             gap: 15px;
             margin-top: 15px;
@@ -514,7 +539,7 @@
             height: 50px;
             animation: spin 1s linear infinite;
         }
-        
+
         .icon-animated {
             display: inline-block;
             transition: transform 0.3s ease;
@@ -524,29 +549,6 @@
             transform: rotate(15deg) scale(1.2);
         }
 
-        #modeToggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: transparent;
-            border: 2px solid var(--highlight);
-            color: var(--highlight);
-            padding: 10px 18px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            z-index: 101;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px var(--shadow-color);
-        }
-
-        #modeToggle:hover {
-            background: var(--highlight);
-            color: var(--text-secondary);
-            box-shadow: 0 0 10px var(--highlight);
-        }
-        
         .user-info {
             margin-bottom: 20px;
             padding-bottom: 10px;
@@ -558,7 +560,7 @@
             font-size: 16px;
             color: var(--text-primary);
         }
-        
+
         .user-info p strong {
             color: var(--secondary-highlight);
             font-size: 18px;
@@ -585,25 +587,25 @@
             margin-top: 15px;
             margin-bottom: 5px;
         }
-        
+
         .itinerary-section p {
             margin-top: 0;
             margin-bottom: 10px;
             color: var(--text-primary);
         }
-        
+
         .itinerary-section ul {
             list-style: none;
             padding-left: 20px;
             margin-bottom: 10px;
         }
-        
+
         .itinerary-section li {
             position: relative;
             margin-bottom: 8px;
             padding-left: 20px;
         }
-        
+
         .itinerary-section li::before {
             content: '•';
             position: absolute;
@@ -618,11 +620,11 @@
             text-decoration: none;
             font-weight: 600;
         }
-        
+
         .itinerary-section a:hover {
             text-decoration: underline;
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -636,13 +638,13 @@
             text-align: left;
             color: var(--text-primary);
         }
-        
+
         th {
             background-color: var(--highlight);
             color: var(--text-secondary);
             font-weight: 600;
         }
-        
+
         tr:nth-child(even) {
             background-color: color-mix(in srgb, var(--bg-secondary) 80%, transparent);
         }
@@ -655,11 +657,13 @@
     </style>
 </head>
 <body data-theme="theme-1">
-    <button id="modeToggle">✨ Theme</button>
+    <div class="navbar-right">
+        <button id="modeToggle">✨ Theme</button>
+        <button class="logout-btn" id="logoutButton" style="display: none;">Logout</button>
+    </div>
     <div class="sidebar">
         <div class="user-info">
             <p>Welcome, <strong id="usernameDisplay">Guest</strong>!</p>
-            <button class="logout-btn" id="logoutButton" style="display: none;">Logout</button>
         </div>
         <h2><span class="icon-animated">✈️</span> Trip Settings</h2>
 
@@ -723,18 +727,18 @@
         <div class="spinner" id="spinner"></div>
 
         <button class="generate-btn" id="generateButton" onclick="generatePlan()">✨ Generate My Perfect Travel Plan</button>
-        
+
         <div class="itinerary-section" id="outputPlan">
             <h2>Your generated travel plan will appear here.</h2>
             <p>Fill in the details on the left and click "Generate" to start planning your perfect trip!</p>
         </div>
-        
+
         <div class="booking-links-section" id="bookingLinksContainer" style="display: none;">
         </div>
 
         <div class="live-prices-section" id="livePricesContainer" style="display: none;">
         </div>
-        
+
         <div class="budget-summary-section" id="budgetSummaryContainer" style="display: none;">
         </div>
 
@@ -783,15 +787,14 @@
     const listenButton = document.getElementById('listenButton');
     const askQuestionButton = document.getElementById('askQuestionButton');
     const spinner = document.getElementById('spinner');
-    
+
     const outputPlan = document.getElementById('outputPlan');
     const bookingLinksContainer = document.getElementById('bookingLinksContainer');
     const livePricesContainer = document.getElementById('livePricesContainer');
     const budgetSummaryContainer = document.getElementById('budgetSummaryContainer');
-    
-    // Consolidated 'body' variable declaration to one single place
+
     const body = document.body;
-    
+
     const themes = [
         "theme-1", "theme-2", "theme-3", "theme-4", "theme-5", "theme-6", "theme-7", "theme-8", "theme-9", "theme-10"
     ];
@@ -819,7 +822,7 @@
         body.setAttribute('data-theme', themeName);
         localStorage.setItem('selectedTheme', themeName);
     }
-    
+
     function applyRandomBackground() {
         const randomImage = backgroundImages[Math.floor(Math.random() * backgroundImages.length)];
         body.style.backgroundImage = `url('${randomImage}')`;
@@ -832,7 +835,7 @@
         applyTheme(newTheme);
         applyRandomBackground();
     }
-    
+
     document.getElementById('modeToggle').addEventListener('click', toggleTheme);
 
     function updateUsernameAndLogoutButton(user) {
@@ -944,7 +947,7 @@
     function renderFormattedPlan(planText) {
         const container = document.getElementById('outputPlan');
         container.innerHTML = '';
-        
+
         if (!planText || planText.trim() === "") {
             container.innerHTML = '<h2>Failed to generate plan. Please try again.</h2><p>Our AI could not create a plan with the provided details.</p>';
             return;
@@ -956,7 +959,7 @@
 
         lines.forEach(line => {
             const trimmedLine = line.trim();
-            
+
             if (trimmedLine.match(/^Day \d+:/)) {
                 currentElement = document.createElement('h3');
                 currentElement.innerHTML = trimmedLine;
@@ -992,7 +995,7 @@
                 lastTagWasList = false;
             }
         });
-        
+
         if (!container.querySelector('h2')) {
             const mainHeading = document.createElement('h2');
             mainHeading.textContent = `Travel Plan for ${document.getElementById('destination').value}`;
@@ -1000,7 +1003,6 @@
         }
         container.style.display = 'block';
     }
-
 
     function displayBudgetSummary(budgetData) {
         const container = document.getElementById('budgetSummaryContainer');
@@ -1022,11 +1024,10 @@
         container.style.display = 'block';
     }
 
-
     function displayLivePrices(liveData) {
         const container = document.getElementById('livePricesContainer');
         container.innerHTML = '';
-        
+
         if (Object.keys(liveData).length === 0) {
             container.style.display = 'none';
             return;
@@ -1057,7 +1058,7 @@
     function displayBookingLinks(links) {
         const container = document.getElementById('bookingLinksContainer');
         container.innerHTML = '';
-        
+
         if (Object.keys(links).length === 0) {
             container.style.display = 'none';
             return;
@@ -1078,7 +1079,6 @@
         container.innerHTML = html;
         container.style.display = 'block';
     }
-
 
     async function generatePlan() {
         bookingLinksContainer.style.display = 'none';
@@ -1150,9 +1150,9 @@
 
             const data = await res.json();
             const plan = data.plan || 'Failed to generate plan. Please try again.';
-            
+
             renderFormattedPlan(plan);
-            
+
             if (data.links) {
                 displayBookingLinks(data.links);
             }
@@ -1178,7 +1178,6 @@
         document.getElementById('outputDestination').textContent = destination || 'Not set';
         document.getElementById('outputDuration').textContent = duration + ' days';
     }
-
 
     async function downloadPlan() {
         const text = document.getElementById('outputPlan').textContent;
@@ -1355,7 +1354,6 @@
         }
     }
 
-
     document.addEventListener('DOMContentLoaded', () => {
         checkAuthStatus();
         updateBudgetLabel();
@@ -1380,6 +1378,5 @@
 
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 </body>
 </html>
